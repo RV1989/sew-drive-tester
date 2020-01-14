@@ -5,6 +5,20 @@ import {
   createProtocol,
   installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
+import {ipcMain} from 'electron'
+import {
+  OPCUAClient,
+  MessageSecurityMode,
+  SecurityPolicy,
+  AttributeIds,
+  makeBrowsePath,
+  ClientSubscription,
+  TimestampsToReturn,
+  MonitoringParametersOptions,
+  ReadValueIdLike,
+  ClientMonitoredItem,
+  DataValue
+} from "node-opcua";
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -71,6 +85,40 @@ app.on('ready', async () => {
 
   }
   createWindow()
+})
+
+
+
+ipcMain.on('connect',async (event,opcEndPoint)  =>{
+
+  const connectionStrategy = {
+    initialDelay: 10,
+    maxRetry: 10
+  };
+  const options = {
+    applicationName: "MyClient",
+    //connectionStrategy: connectionStrategy,
+    //securityMode: MessageSecurityMode.None,
+    //securityPolicy: SecurityPolicy.None,
+    endpoint_must_exist: false
+  };
+  let opcClient = OPCUAClient.create(options);
+  //console.log(opcClient);
+  await opcClient.connect(opcEndPoint).catch(e => {
+    
+    console.log(e);
+  });
+  //console.log("connected");
+  let session = await opcClient.createSession();
+  let variable = 'ns=3;s="dev"."modeDev"';
+  let dataToWrite = {
+    dataType: "Boolean",
+    value: true
+  };
+  //console.log(session)
+  session.writeSingleNode(variable, dataToWrite);
+  event.reply('connect', 'pong')
+
 })
 
 // Exit cleanly on request from parent process in development mode.
