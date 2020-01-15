@@ -1,7 +1,7 @@
 import {readFile, utils ,WorkBook ,WorkSheet , Range,Sheet2JSONOpts} from 'xlsx'
 
 
-interface ufrConfig {
+export interface ufrConfig {
     ipAddress : string
     pnName : string
     gsd : string
@@ -10,7 +10,7 @@ interface ufrConfig {
     startAddress : string
     drivesId? : hwIdConfig[] | undefined
 }
-interface hwIdConfig {
+export interface hwIdConfig {
     hwIdName : string
     type : string
     hwId : string
@@ -88,7 +88,7 @@ const readWorkBook = async (path : string): Promise<WorkBook> => {
     for ( let drive of drives){
         let hwId  = hwIdConfig.find(x =>x.hwIdName.includes(ufr.pnName) && x.hwIdName.includes(drive.pnName)  )
         if( hwId){
-            hwId.color = "#BBDEFB"
+            hwId.color = "#FFFFFF"
             returnDrives.push(hwId)
         }
         

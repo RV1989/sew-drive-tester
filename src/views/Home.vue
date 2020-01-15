@@ -15,13 +15,13 @@
                 <v-text-field v-model="opcEndPoint" label="opc://"></v-text-field>
               </v-col>
               <v-col>
-                <v-file-input v-model="file" accept=".xlsx" label="File input"></v-file-input>
+                <v-file-input v-model="file" accept=".xlsx" label="File input" @file="openExcel()"></v-file-input>
               </v-col>
             </v-row>
             <v-row>
-              <v-btn big color="primary" @click="openExcel()">ReadFile</v-btn>
+              
               <v-spacer></v-spacer>
-              <v-btn big color="primary" @click="connectOpcua()">Connect</v-btn>
+              <v-btn big color="primary" @click="connectOpcua()">Run test</v-btn>
             </v-row>
           </v-container>
         </v-form>
@@ -30,8 +30,12 @@
       <v-list>
         <v-list-item v-for="(ufr,i) in ufrs" :key="i">
           <v-container>
-            <v-list>
-              <v-header>Drives {{ufr.pnName}}</v-header>
+            <v-list subheader>
+              <v-subheader>
+                <v-checkbox v-model="selectedUfr" :value="i"></v-checkbox>
+                Drives {{ufr.pnName}}
+                
+              </v-subheader>
               <v-list-item-group>
                 <v-list-item
                   v-for="(drive, i) in ufr.drivesId"
@@ -55,7 +59,7 @@
 <script>
 // @ is an alias to /src
 import { getUfrs } from "../lib/readExcel";
-import { ipcRenderer }  from 'electron'
+import { ipcRenderer, remote } from "electron";
 
 export default {
   name: "home",
@@ -63,6 +67,8 @@ export default {
     return {
       opcEndPoint: "opc.tcp://192.168.0.1:4840",
       selected: [],
+      selectedUfr: [],
+      selectedUfrOld: [],
       opcClient: null,
       file: null,
       ufrs: [],
@@ -80,24 +86,77 @@ export default {
       this.ufrs = await getUfrs(this.file.path);
     },
     async connectOpcua() {
-
-      ipcRenderer.send('connect',this.opcEndPoint)
+      let args = {};
+      args.opcUaEndPoint = this.opcEndPoint;
+      args.drives = this.selected;
+      ipcRenderer.send("runTest", args);
 
       /*
 
       */
+    },
+
+    updateDrive(drive) {
+      for (let [i, ufr] of this.ufrs.entries()) {
+        let index = ufr.drivesId.findIndex(
+          obj => obj.hwIdName === drive.hwIdName
+        );
+        if (index !== -1) {
+          this.$set(this.ufrs[i].drivesId, index, { ...drive });
+        }
+      }
+    },
+    selectAll(ufr) {
+      console.log(this.selectedUfr);
+
+      for (let drive of ufr.drivesId) {
+        this.selected.push(drive);
+      }
+    },
+    deSelectAll(ufr) {
+      for (let drive of ufr.drivesId) {
+        for (var i = 0; i < this.selected.length; i++) {
+          if (this.selected[i].hwIdName === drive.hwIdName) {
+            this.selected.splice(i, 1);
+            i--;
+          }
+        }
+      }
     }
-    
+  },
+  watch: {
+    selectedUfr: function(val) {
+      if (val.length > this.selectedUfrOld.length) {
+        let diff = val.filter(x => !this.selectedUfrOld.includes(x));
+        console.log(diff)
+        if (diff) {
+          this.selectAll(this.ufrs[diff[0]]);
+        }
+      } else if (val.length < this.selectedUfrOld.length) {
+        let diff = this.selectedUfrOld.filter(x => !val.includes(x));
+        console.log(diff)
+        if (diff) {
+          this.deSelectAll(this.ufrs[diff[0]]);
+        }
+      }
+
+      console.log(val);
+      this.selectedUfrOld = val;
+    },
+    file : function(val){
+      this.openExcel()
+    }
   },
   components: {},
-  mounted () {
-
-
-  this.$electron.ipcRenderer.on('connect', (event, data) => {
-   
-    console.log(data)
-  })
-}
+  mounted() {
+    ipcRenderer.on("Error", (event, data) => {
+      console.log(data);
+    });
+    ipcRenderer.on("UpdateDrive", (event, data) => {
+      console.log(data);
+      this.updateDrive(data);
+    });
+  }
 };
 </script>
 
