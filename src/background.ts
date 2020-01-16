@@ -80,7 +80,7 @@ app.on('ready', async () => {
 
 ipcMain.on('runTest',async (event,args)  =>{
 console.log(args)
-runTest(win, args.opcUaEndPoint, args.drives)
+runTest(win, args.opcUaEndPoint, args.drives, args.speed , args.ramp)
 })
 
 // Exit cleanly on request from parent process in development mode.

@@ -18,6 +18,15 @@
                 <v-file-input v-model="file" accept=".xlsx" label="File input" @file="openExcel()"></v-file-input>
               </v-col>
             </v-row>
+
+            <v-row>
+              <v-col>
+                <v-text-field v-model="speed"  type="number" label="speed"></v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field v-model="ramp" type="number" label="ramp"></v-text-field>
+              </v-col>
+            </v-row>
             <v-row>
               
               <v-spacer></v-spacer>
@@ -30,7 +39,7 @@
       <v-list>
         <v-list-item v-for="(ufr,i) in ufrs" :key="i">
           <v-container>
-            <v-list subheader>
+            <v-list two-line  subheader>
               <v-subheader>
                 <v-checkbox v-model="selectedUfr" :value="i"></v-checkbox>
                 Drives {{ufr.pnName}}
@@ -44,7 +53,8 @@
                 >
                   <v-checkbox v-model="selected" :value="drive" color="primary"></v-checkbox>
                   <v-list-item-content>
-                    <v-list-item-title v-html="drive.hwIdName"></v-list-item-title>
+                    <v-list-item-title v-text="drive.hwIdName"></v-list-item-title>
+                    <v-list-item-subtitle v-text="drive.status"></v-list-item-subtitle>
                   </v-list-item-content>
                 </v-list-item>
               </v-list-item-group>
@@ -66,6 +76,8 @@ export default {
   data() {
     return {
       opcEndPoint: "opc.tcp://192.168.0.1:4840",
+      speed: 2500,
+      ramp : 1000,
       selected: [],
       selectedUfr: [],
       selectedUfrOld: [],
@@ -83,6 +95,8 @@ export default {
       let args = {};
       args.opcUaEndPoint = this.opcEndPoint;
       args.drives = this.selected;
+      args.speed = this.speed
+      args.ramp = this.ramp
       ipcRenderer.send("runTest", args);
 
       /*

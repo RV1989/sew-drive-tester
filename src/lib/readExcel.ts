@@ -15,6 +15,7 @@ export interface hwIdConfig {
     type : string
     hwId : string
     color: string
+    status: string
 }
  
 const getMaxRows = (_workbook: WorkBook , _sheet:any) =>{
@@ -89,6 +90,7 @@ const readWorkBook = async (path : string): Promise<WorkBook> => {
         let hwId  = hwIdConfig.find(x =>x.hwIdName.includes(ufr.pnName) && x.hwIdName.includes(drive.pnName)  )
         if( hwId){
             hwId.color = "#FFFFFF"
+            hwId.status = 'not started'
             returnDrives.push(hwId)
         }
         
@@ -105,7 +107,7 @@ const readWorkBook = async (path : string): Promise<WorkBook> => {
     let ufr = ufrConfig.filter( row => row.gsd.includes('/DAP/'))
        
     //console.log(ufr)
-
+    
     for (let u of ufr){
         let drive = await getDrives(hwIDConfig, ufrConfig, u )
         //console.log(drive)
