@@ -6,7 +6,7 @@
 
         <v-spacer></v-spacer>
       </v-toolbar>
-
+      
       <v-container fluid>
         <v-form class="pa-4 pt-6">
           <v-container>
@@ -72,12 +72,6 @@ export default {
       opcClient: null,
       file: null,
       ufrs: [],
-      drives: [
-        { id: "drive1", color: "#80CBC4" },
-        { id: "drive2", color: "#F48FB1" },
-        { id: "drive3", color: "#BBDEFB" },
-        { id: "drive4", color: "#FFFFFF" }
-      ]
     };
   },
   methods: {
