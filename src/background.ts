@@ -1,5 +1,6 @@
 'use strict'
 
+
 import { app, protocol, BrowserWindow } from 'electron'
 import {
   createProtocol,
@@ -79,7 +80,6 @@ app.on('ready', async () => {
 
 
 ipcMain.on('runTest',async (event,args)  =>{
-console.log(args)
 runTest(win, args.opcUaEndPoint, args.drives, args.speed , args.ramp)
 })
 

@@ -1,4 +1,4 @@
-import { ipcMain, BrowserWindow } from 'electron'
+import { BrowserWindow } from 'electron'
 import {
   OPCUAClient,
   ClientSession,
@@ -8,7 +8,13 @@ import {
 import { hwIdConfig } from './readExcel'
 import { sleep } from './sleep'
 
-export const runTest = async (win: BrowserWindow, opcUaEndPoint: string, drives: hwIdConfig[], speed: number, ramp: number) => {
+export const runTest = async (win: BrowserWindow|null , opcUaEndPoint: string, drives: hwIdConfig[], speed: number, ramp: number): Promise <string> => {
+  if(!win){
+    return new Promise<string>((resolve,reject) => {
+      reject('noWindow');
+  })
+}
+  
   console.log(opcUaEndPoint)
   const options = {
     applicationName: "SewDriveTester",
@@ -146,6 +152,10 @@ export const runTest = async (win: BrowserWindow, opcUaEndPoint: string, drives:
     win.webContents.send('Error', 'Could not create session')
 
   }
+
+  return new Promise<string>((resolve,reject) => {
+    resolve('done');
+})
 
 }
 
