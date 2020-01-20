@@ -7,7 +7,7 @@ import {
   installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
 import {ipcMain} from 'electron'
-import {runTest} from'./lib/opcuaHandler'
+import {runTest} from'./lib/runTest'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 

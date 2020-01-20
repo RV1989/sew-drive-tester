@@ -75,7 +75,7 @@ export default {
   name: "home",
   data() {
     return {
-      opcEndPoint: "opc.tcp://192.168.0.1:4840",
+      opcEndPoint: "192.168.0.1",
       speed: 2500,
       ramp : 1000,
       selected: [],
