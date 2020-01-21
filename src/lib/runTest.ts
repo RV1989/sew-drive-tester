@@ -56,7 +56,7 @@ export const runTest = async (win: BrowserWindow | null, ipAdress: string, drive
   const varDriveEnabled = '"dev"."driveEnabled"';
   const varDriveReady = '"dev"."driveReady"';
 
-
+  await _client.request('PlcProgram.Write', { var: varModeDev, value: true })
   //console.log(session)
 
   for (let drive of drives) {
@@ -145,8 +145,8 @@ export const runTest = async (win: BrowserWindow | null, ipAdress: string, drive
 
 
   await _client.request('PlcProgram.Write', { var: varForward, value: false })
-  await _client.request('PlcProgram.Write', { varDriveEnabled, value: false })
-  await _client.request('PlcProgram.Write', { varModeDev, value: false })
+  await _client.request('PlcProgram.Write', { var: varDriveEnabled, value: false })
+  await _client.request('PlcProgram.Write', { var: varModeDev, value: false })
 
   return new Promise<string>((resolve, reject) => {
     resolve('done');
